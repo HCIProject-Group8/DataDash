@@ -18,7 +18,7 @@
   box-sizing:border-box;
   padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
 }
-@media (prefers-color-scheme: dark){
+@media (prefers-color-scheme: dark) and (max-width:0px){
   :root:not([data-theme="light"]){
     --bg:#11171e; --surface:#19212b; --surface-2:#202a36; --ink:#e4e9ef; --ink-2:#9aa6b4; --line:#2d3946;
     --bar:#0b1117; --bar-ink:#e4e9ef; --bar-ink-2:#8193a7;
@@ -119,7 +119,7 @@ main.dash{padding:18px; overflow:auto; min-width:0}
 .modal p{margin:6px 0 12px; color:var(--ink-2)}
 .field{margin:12px 0}
 .field > label, .field > .flabel{display:block; font-weight:600; font-size:14px; margin-bottom:6px}
-.field input[type=text], .field select{width:100%; padding:9px 10px; border-radius:8px; border:1px solid var(--line); background:var(--surface)}
+.field input[type=text], .field select, .field textarea{width:100%; padding:9px 10px; border-radius:8px; border:1px solid var(--line); background:var(--surface);color:var(--ink)}
 .choice{display:flex; gap:8px; flex-wrap:wrap}
 .choice label{border:1px solid var(--line); border-radius:8px; padding:8px 12px; display:flex; gap:8px; align-items:center; font-size:14px; cursor:pointer}
 .choice input:checked + span{font-weight:600}
@@ -209,16 +209,42 @@ main.dash{padding:18px; overflow:auto; min-width:0}
   <div class="panel">
     <h1>Interface learning study</h1>
     <p class="sub">A UT Dallas CS 6326 course project on how AI assistants help people learn unfamiliar software.</p>
-    <p>You will complete two short tasks in a practice sales dashboard called DataDash. An AI assistant is there if you need help. After each task you will answer two quick questions.</p>
-    <p>Please use a laptop or desktop computer and finish in one sitting. Taking part is voluntary, and you can stop at any time by closing this page. We do not collect your name or email. You get an anonymous ID, and your answers are seen only by the research team.</p>
+    <p>You'll explore a practice sales dashboard and complete activities involving filtering information, working with charts, and exporting a visualization. You are not expected to know DataDash beforehand.</p>
+    <p>First you'll answer five short background questions, then receive a dashboard tour and complete an <strong>unscored training activity</strong>. After that, you'll work through two study tasks. You can ask the AI assistant for help, or work independently. After each study task you'll rate your experience (five short questions), followed by final written feedback.</p>
+    <p class="note">Plan for approximately 15–25 minutes; actual time may vary. Please use a laptop or desktop and finish in one sitting.</p>
+    <p>Participation is voluntary. You may stop at any time by closing this page. We do not request your name, email, or exact date of birth. An anonymous study ID will be linked to your optional background answers, task interactions, assistant messages, ratings, and final feedback, and submitted to the research team's study storage. Please avoid entering identifying information in free-text answers.</p>
     <div class="field">
       <label><input type="checkbox" id="consent"> I am 18 or older and I agree to take part.</label>
     </div>
     <p class="note" id="setupMsg" role="alert"></p>
     <div class="actions" style="display:flex;justify-content:flex-end;margin-top:18px">
-      <button class="btn primary" id="startSession" disabled>Start study</button>
+      <button class="btn primary" id="startSession" disabled>Continue to background questions</button>
     </div>
   </div>
+</section>
+
+
+<!-- ============ PARTICIPANT BACKGROUND ============ -->
+<section id="background" class="screen hidden">
+  <form id="backgroundForm" class="panel" autocomplete="off">
+    <p class="note">Step 2 of 4 · Before the tasks</p>
+    <h1>Participant background</h1>
+    <p class="sub">These answers help us understand different levels of experience. Choose "Prefer not to answer" whenever you wish. No names or exact ages are collected.</p>
+    <div class="field"><label for="bgAge">1. What is your age range? (optional)</label>
+      <select id="bgAge"><option value="">Prefer not to answer</option><option value="18-24">18–24</option><option value="25-34">25–34</option><option value="35-44">35–44</option><option value="45+">45 or older</option></select></div>
+    <div class="field"><label for="bgDashboard">2. How frequently have you used dashboard or data-visualization software?</label>
+      <select id="bgDashboard" required><option value="" selected disabled>Select an answer</option><option value="never">Never</option><option value="rarely">Rarely</option><option value="sometimes">Sometimes</option><option value="often">Often</option><option value="prefer_not">Prefer not to answer</option></select>
+      <p class="note">For example: Tableau, Power BI, Looker Studio, or analytics dashboards.</p></div>
+    <div class="field"><label for="bgAI">3. How often do you use AI assistants?</label>
+      <select id="bgAI" required><option value="" selected disabled>Select an answer</option><option value="never">Never</option><option value="rarely">Rarely</option><option value="sometimes">Sometimes</option><option value="often">Often</option><option value="prefer_not">Prefer not to answer</option></select>
+      <p class="note">For example: ChatGPT, Gemini, Copilot, or AI help embedded in software.</p></div>
+    <div class="field"><label for="bgCharts">4. Have you previously created or customized charts and dashboards?</label>
+      <select id="bgCharts" required><option value="" selected disabled>Select an answer</option><option value="never">Never</option><option value="basic">Yes, basic charts</option><option value="dashboard">Yes, interactive dashboards</option><option value="prefer_not">Prefer not to answer</option></select></div>
+    <div class="field"><label for="bgConfidence">5. How confident are you learning unfamiliar software on your own?</label>
+      <select id="bgConfidence" required><option value="" selected disabled>Select an answer</option><option value="prefer_not">Prefer not to answer</option><option value="1">1 – Not confident</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7 – Very confident</option></select></div>
+    <p class="note" role="alert" id="bgMsg"></p>
+    <div class="actions" style="display:flex;justify-content:flex-end;margin-top:18px"><button class="btn primary" id="bgContinue" type="submit">Continue to training</button></div>
+  </form>
 </section>
 
 <!-- ============ APP ============ -->
@@ -298,7 +324,7 @@ main.dash{padding:18px; overflow:auto; min-width:0}
     <aside class="assistant hidden" id="assistant" aria-label="AI assistant">
       <header>
         <h2>AI Assistant</h2>
-        <span class="cond-chip" id="condChip"></span>
+        <span class="cond-chip hidden" id="condChip" aria-hidden="true"></span>
         <button class="icon-btn" id="btn-close-assist" aria-label="Close assistant" style="width:30px;height:30px">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 6l12 12M18 6L6 18"/></svg>
         </button>
@@ -352,6 +378,8 @@ function sales(m,r,c){return Math.round(catBase[CATS[c]]*regFactor[REGIONS[r]]*s
 /* ------------------------------------------------------------------
    TASKS
 ------------------------------------------------------------------ */
+const TRAINING={id:"TRAIN", name:"Practice: Ask for help and filter Q2",
+  text:"Practice only (not graded): Ask the assistant a question about using DataDash. Then use the filter menu to show Q2 (April–June) sales and press Apply."};
 const TASKS={
   A:{id:"A", name:"Filter and Export",
      text:"Show third-quarter (Q3) sales for the West region only, then export the “Sales by month” chart as a PNG."},
@@ -365,9 +393,17 @@ const TASKS={
 let S={};           // session
 let D={};           // dashboard state for current task
 let T=null;         // current task runtime
+let responseGeneration=0; // invalidates delayed assistant responses between tasks
 const $=id=>document.getElementById(id);
 
 function freshDash(){return {quarter:"All", regions:[...REGIONS], compare:null, exports:[]};}
+function resetTaskUI(){
+  responseGeneration++;
+  pendingFollow=null; D=freshDash();
+  $("msgs").innerHTML=""; $("ask").value="";
+  hideRing(); closeLayer(); $("assistant").classList.add("hidden");
+  renderDash();
+}
 
 /* ------------------------------------------------------------------
    LOGGING
@@ -549,8 +585,9 @@ function openMore(btn, which){
 }
 
 async function exportChart(which){
+  const exportGeneration=responseGeneration;
   const state={chart:which, quarter:D.quarter, regions:[...D.regions]};
-  D.exports.push(state); log("ui_action",{action:"export_png",...state});
+  log("ui_action",{action:"export_png_attempt",...state});
   const c={bar:"#3b6ea8", alt:"#d08b2c", grid:"#d6dce3", muted:"#56616e", ink:"#1d2733"};
   const title=which==="month"?"Sales by month":"Sales by category";
   const inner=which==="month"?barSVG(monthTotals(),c,d=>MONTHS[d.m]):hbarSVG(catTotals(),c,640,260);
@@ -565,10 +602,15 @@ async function exportChart(which){
     const cv=document.createElement("canvas"); cv.width=1280; cv.height=640;
     cv.getContext("2d").drawImage(img,0,0,1280,640);
     const blob=await new Promise(r=>cv.toBlob(r,"image/png"));
-    toast("Chart exported as PNG");
+    if(!blob) throw new Error("PNG conversion failed");
     const res=await saveFile(title.toLowerCase().replace(/\s+/g,"_")+".png", blob);
-    log("ui_action",{action:"export_save_result",result:res});
-  }catch(err){ toast("Chart exported"); log("ui_action",{action:"export_render_error"}); }
+    if(res==="saved"){
+      // Browser downloads confirm initiation, not the contents of the Downloads folder.
+      if(T && T.id==="A" && responseGeneration===exportGeneration) D.exports.push(state);
+      toast("PNG download started");
+    }else toast(res==="declined"?"PNG download was declined":"PNG download failed. Try again.");
+    log("ui_action",{action:"export_save_result",result:res,...state});
+  }catch(err){ toast("Could not export PNG. Try again."); log("ui_action",{action:"export_render_error",error:String(err)}); }
 }
 
 function openAddWidget(){
@@ -637,6 +679,15 @@ function ringHit(id){ if(ringTarget===id){ log("highlight_target_clicked",{targe
    SCRIPTED EXPLANATIONS
 ------------------------------------------------------------------ */
 const EXPL={
+  training:{target:"btn-filter",
+    base:"DataDash has sales totals and charts in the center, navigation icons on the left, and a filter menu in the top toolbar. For practice, use that filter menu to select Q2, then Apply. You can ask me for more help.",
+    detail:"Practice step 1: Click the funnel-shaped Filter icon in the top toolbar.\nStep 2: Under Quarter select Q2 (April through June).\nStep 3: Click Apply. The dashboard should say 'Showing Q2'.",
+    angle:"Think of Q2 as April, May, and June. The top-bar funnel is where you choose that time period; Apply updates the dashboard. No region change is required for practice.",
+    follow:[
+      [["where","funnel","icon","find"],"Find the funnel-shaped Filter icon on the right side of the dark top bar, just to the left of Share."],
+      [["quarter","q2","april","month","choose"],"In the filter popover, under Quarter, select Q2. It represents April, May, and June."],
+      [["apply","update","finish"],"Select Q2 and then press Apply at the bottom of the filter menu. The dashboard header will show Q2."],
+    ]},
   filter:{target:"btn-filter",
     base:"Click the funnel icon in the top bar, then choose Region → West. The quarter is set in the same menu.",
     detail:"Step 1: Find the funnel icon (top-right corner of the dark top bar).\nStep 2: In the menu that opens, pick “Q3” under Quarter.\nStep 3: Click “Region” to open the list, untick the other regions, and keep only “West” ticked.\nStep 4: Press Apply. The charts and totals update to show only Q3 West sales.",
@@ -690,6 +741,7 @@ function detectIntent(text){
   return null;
 }
 function nextStepIntent(){
+  if(T.id==="TRAIN") return "training";
   if(T.id==="A"){ const f=D.quarter==="Q3"&&D.regions.length===1&&D.regions[0]==="West"; return f?"export":"filter"; }
   return D.compare?"charttype":"addchart";
 }
@@ -713,8 +765,10 @@ function setComposerMode(){
 function respond(intent, kind, opts={}){
   const typing=document.createElement("div"); typing.className="typing"; typing.textContent="Assistant is typing…";
   $("msgs").appendChild(typing); scrollMsgs();
+  const generation=responseGeneration;
   setTimeout(()=>{
     typing.remove();
+    if(generation!==responseGeneration || !T) return;
     let text, target=EXPL[intent].target;
     if(intent==="charttype" && !D.compare){ text=CHARTTYPE_NO_CHART; target="btn-add-widget"; }
     else if(kind==="base") text=(opts.prefix||"")+EXPL[intent].base;
@@ -768,8 +822,9 @@ function handleAsk(text){
     respond(pf.intent,"followup",{text:ans||("Let me go through it step by step.\n"+EXPL[pf.intent].detail)});
     return;
   }
-  let intent=detectIntent(text);
+  let intent=T && T.id==="TRAIN" ? "training" : detectIntent(text);
   log("help_request",{text, intent:intent||"unmatched"});
+  if(T && T.id==="TRAIN") T.trainingAsked=true;
   if(!intent){ intent=nextStepIntent(); respond(intent,"base",{prefix:"Here's the next step for your task. "}); }
   else respond(intent,"base");
 }
@@ -786,6 +841,7 @@ function closeAssistant(){ $("assistant").classList.add("hidden"); log("assistan
    TASK FLOW
 ------------------------------------------------------------------ */
 function evaluate(){
+  if(T.id==="TRAIN") return {correct:D.quarter==="Q2",components:{practice_q2_applied:D.quarter==="Q2"}};
   if(T.id==="A"){
     const filterOk=D.quarter==="Q3"&&D.regions.length===1&&D.regions[0]==="West";
     const exportOk=D.exports.some(x=>x.chart==="month"&&x.quarter==="Q3"&&x.regions.length===1&&x.regions[0]==="West");
@@ -796,44 +852,69 @@ function evaluate(){
   return {correct:addOk&&lineOk, components:{compare_electronics_furniture:addOk, type_line:lineOk}};
 }
 
+function showOrientation(){
+  const scrim=document.createElement("div"); scrim.className="scrim";
+  scrim.innerHTML=`<div class="modal" role="dialog" aria-modal="true" aria-labelledby="orientationTitle">
+    <p class="note">Step 3 of 4 · Dashboard orientation</p>
+    <h2 id="orientationTitle">Getting to know DataDash</h2>
+    <p>Before the study tasks, here's a brief tour of the practice dashboard:</p>
+    <ol class="tour-list">
+      <li><strong>Top toolbar:</strong> the funnel icon opens data filters, and the Share button is nearby.</li>
+      <li><strong>Sales overview:</strong> the middle area shows sales totals and charts. Each chart has its own controls.</li>
+      <li><strong>Left sidebar:</strong> page navigation is at the top; a + button can add a chart.</li>
+      <li><strong>AI Assistant:</strong> use “Ask the assistant” in the top bar to open the chat and type a question. You can close the panel to return to the dashboard.</li>
+    </ol>
+    <p>In the unscored practice activity, you'll send the assistant a question and apply a Q2 filter. Depending on your assigned assistant, you may also see options to clarify an explanation. The practice is not part of your measured results.</p>
+    <div class="actions"><button class="btn primary" id="orientationGo">Start practice activity</button></div>
+  </div>`;
+  document.body.appendChild(scrim);log("orientation_open");
+  $("orientationGo").addEventListener("click",()=>{log("orientation_complete");scrim.remove();showTaskCard();});
+}
 function showTaskCard(){
-  const idx=S.taskIndex; const task=TASKS[S.order[idx]];
+  const idx=S.taskIndex; const training=!S.trainingComplete;
+  const task=training?TRAINING:TASKS[S.order[idx]];
   const scrim=document.createElement("div"); scrim.className="scrim";
   scrim.innerHTML=`<div class="modal" role="dialog" aria-modal="true" aria-labelledby="tcT">
-    <p class="note" style="margin:0">Task ${idx+1} of ${S.order.length}</p>
+    <p class="note" style="margin:0">${training?"Unscored training task":`Task ${idx+1} of ${S.order.length}`}</p>
     <h2 id="tcT">${task.name}</h2><p style="color:var(--ink);font-size:16px">${task.text}</p>
-    <p>Work in DataDash as you normally would. Whenever you're unsure how to do something, open the assistant with the button in the top bar. Press Submit task when you're done.</p>
+    <p>${training?"This activity is unscored. First open <strong>Ask the assistant</strong> and send a question, such as ‘What can I do here?’ You can ask for a different explanation if that option appears. Then complete the Q2 filter exercise. The dashboard and chat will reset before the measured tasks.":"Work in DataDash as you normally would. Ask the assistant when you need help, or work independently. When you finish or cannot continue, submit your task."}</p>
     <div class="actions"><button class="btn primary" id="tcStart">Start task</button></div></div>`;
   document.body.appendChild(scrim);
   $("tcStart").focus();
   $("tcStart").addEventListener("click",()=>{ scrim.remove(); startTask(task); });
 }
 function startTask(task){
-  T={id:task.id, start:performance.now(), helps:0}; D=freshDash();
-  $("msgs").innerHTML=""; pendingFollow=null; hideRing(); closeLayer();
-  $("assistant").classList.add("hidden");
-  $("taskLabel").textContent=`Task ${S.taskIndex+1} of ${S.order.length}`; $("taskText").textContent=task.text;
-  renderDash(); log("task_start",{task_name:task.name});
+  T={id:task.id, start:performance.now(), helps:0, trainingAsked:false}; resetTaskUI();
+  $("taskLabel").textContent=task.id==="TRAIN"?"Practice (not graded)":`Task ${S.taskIndex+1} of ${S.order.length}`; $("taskText").textContent=task.text;
+  renderDash(); log(task.id==="TRAIN"?"training_start":"task_start",{task_name:task.name});
 }
 function submitTask(){
   if(!T) return;
   const scrim=document.createElement("div"); scrim.className="scrim";
   scrim.innerHTML=`<div class="modal" role="dialog" aria-modal="true"><h2>Submit this task?</h2>
-    <p>You won't be able to change it afterwards.</p>
+    <p>You won't be able to change it afterwards. You may submit even if you were unable to finish.</p>
     <div class="actions"><button class="btn" id="sbBack">Keep working</button><button class="btn primary" id="sbYes">Submit task</button></div></div>`;
   document.body.appendChild(scrim);
   scrim.addEventListener("click",e=>{
     if(e.target.id==="sbBack"||e.target===scrim){scrim.remove(); return;}
     if(e.target.id==="sbYes"){
+      if(T && T.id==="TRAIN" && (!T.trainingAsked || D.quarter!=="Q2")){
+        toast(!T.trainingAsked?"First ask the assistant a question for practice.":"For practice, select Q2 and Apply before continuing."); return;
+      }
       scrim.remove();
       const ev=evaluate(); const dur=Math.round(performance.now()-T.start);
+      if(T.id==="TRAIN"){
+        log("training_end",{duration_ms:dur,completed_q2:ev.correct,assistant_practiced:T.trainingAsked});
+        S.trainingComplete=true; T=null;
+        resetTaskUI(); showTaskCard(); return;
+      }
       const evs=S.log.filter(x=>x.task===T.id);
       const rec={task:T.id, duration_ms:dur, correct:ev.correct, components:ev.components,
         help_requests:evs.filter(x=>x.type==="help_request").length,
         revision_requests:evs.filter(x=>x.type==="revision_option").length,
         followups:evs.filter(x=>x.type==="followup_text").length};
       log("task_submit",rec); S.results.push(rec);
-      hideRing(); closeLayer(); $("assistant").classList.add("hidden");
+      responseGeneration++; hideRing(); closeLayer(); $("assistant").classList.add("hidden");
       showRatings(rec);
     }
   });
@@ -843,27 +924,67 @@ function likert(name, low, high){
     <div class="anchors"><span>${low}</span><span>${high}</span></div>`;
 }
 function showRatings(rec){
+  const usedAssistant=rec.help_requests>0;
+  const withNA=(name,low,high)=>`${likert(name,low,high)}<label class="note" style="display:flex;gap:8px;align-items:center;margin-top:10px"><input type="radio" name="${name}" value="not_used"> I did not use the assistant for this task</label>`;
   const scrim=document.createElement("div"); scrim.className="scrim";
   scrim.innerHTML=`<div class="modal" role="dialog" aria-modal="true" aria-labelledby="rtT">
-    <h2 id="rtT">A quick check-in</h2><p>Answer based on the task you just finished.</p>
-    <div class="field"><span class="flabel">How confident are you that you completed the task correctly?</span>${likert("conf","Not at all confident","Completely confident")}</div>
-    <div class="field"><span class="flabel">How uncertain did you feel while doing this task?</span>${likert("unc","Not at all uncertain","Extremely uncertain")}</div>
+    <p class="note">Task ${S.taskIndex+1} of ${S.order.length} · Post-task questionnaire</p>
+    <h2 id="rtT">How was that task?</h2><p>Rate the task you just finished. All five questions are required. For assistant questions, choose "I did not use the assistant" if applicable.</p>
+    <div class="field"><span class="flabel">1. How confident are you that you completed the task correctly?</span>${likert("conf","Not at all confident","Extremely confident")}</div>
+    <div class="field"><span class="flabel">2. How uncertain did you feel while completing this task?</span>${likert("unc","Not at all uncertain","Extremely uncertain")}</div>
+    <div class="field"><span class="flabel">3. How clear were the assistant's explanations?</span>${withNA("clarity","Not at all clear","Extremely clear")}</div>
+    <div class="field"><span class="flabel">4. How much control did you feel you had over your interaction with the assistant?</span>${withNA("control","No control","Complete control")}</div>
+    <div class="field"><span class="flabel">5. How mentally demanding was this task?</span>${likert("demand","Not at all demanding","Extremely demanding")}</div>
+    <p class="note">${usedAssistant?"You asked for assistant help during this task.":"Our log shows no assistant questions for this task. You can choose ‘I did not use the assistant’ for questions 3 and 4."}</p>
     <div class="actions"><button class="btn primary" id="rtGo" disabled>Submit ratings</button></div></div>`;
   document.body.appendChild(scrim);
-  scrim.addEventListener("change",()=>{ $("rtGo").disabled=!(scrim.querySelector("[name=conf]:checked")&&scrim.querySelector("[name=unc]:checked")); });
+  const names=["conf","unc","clarity","control","demand"];
+  scrim.addEventListener("change",()=>{ $("rtGo").disabled=!names.every(n=>scrim.querySelector(`[name="${n}"]:checked`)); });
   $("rtGo").addEventListener("click",()=>{
-    const conf=+scrim.querySelector("[name=conf]:checked").value, unc=+scrim.querySelector("[name=unc]:checked").value;
-    rec.confidence=conf; rec.uncertainty=unc; log("rating",{confidence:conf, uncertainty:unc});
+    const selected=n=>scrim.querySelector(`[name="${n}"]:checked`).value;
+    const val=n=>selected(n)==="not_used"?null:Number(selected(n));
+    rec.confidence=val("conf"); rec.uncertainty=val("unc");
+    rec.explanation_clarity=val("clarity"); rec.perceived_control=val("control"); rec.mental_demand=val("demand");
+    rec.clarity_not_used=selected("clarity")==="not_used";
+    rec.control_not_used=selected("control")==="not_used";
+    log("rating",{confidence:rec.confidence,uncertainty:rec.uncertainty,explanation_clarity:rec.explanation_clarity,
+      perceived_control:rec.perceived_control,mental_demand:rec.mental_demand,clarity_not_used:rec.clarity_not_used,control_not_used:rec.control_not_used});
     scrim.remove(); T=null; S.taskIndex++;
-    if(S.taskIndex<S.order.length) showTaskCard(); else finish();
+    if(S.taskIndex<S.order.length) showTaskCard(); else showInterview();
   });
 }
-const SHEET_URL="https://script.google.com/macros/s/AKfycbwE2QI-BB3TFdoFF_ae5A0XUpyxuw7TIBuZgl4fqczXkOZdixzsTHgiEBa3O25lvA6o/exec";
+function showInterview(){
+  const usedRevisions=S.cond==="revisable" && S.results.some(r=>r.revision_requests>0);
+  const optionalRevision=usedRevisions?`<div class="field"><label for="intRevision">5. Did requesting a different explanation help you understand what to do? Please explain. (optional)</label><textarea id="intRevision" rows="3" maxlength="2000"></textarea></div>`:"";
+  const scrim=document.createElement("div"); scrim.className="scrim";
+  scrim.innerHTML=`<div class="modal" role="dialog" aria-modal="true" aria-labelledby="intT">
+    <h2 id="intT">Final feedback</h2>
+    <p>You have finished both tasks. Please share your experience. Every question is optional; you may leave any answer blank.</p>
+    <div class="field"><label for="intHelpful">1. What was the most helpful aspect of the assistant?</label><textarea id="intHelpful" rows="3" maxlength="2000"></textarea></div>
+    <div class="field"><label for="intFrustrating">2. What was the most confusing or frustrating aspect?</label><textarea id="intFrustrating" rows="3" maxlength="2000"></textarea></div>
+    <div class="field"><label for="intNeeded">3. Did you feel you could get the type of explanation you needed? Why or why not?</label><textarea id="intNeeded" rows="3" maxlength="2000"></textarea></div>
+    <div class="field"><label for="intChange">4. What would you change to make the assistant more useful?</label><textarea id="intChange" rows="3" maxlength="2000"></textarea></div>
+    ${optionalRevision}
+    <div class="actions"><button class="btn primary" id="intFinish">Finish study</button></div></div>`;
+  document.body.appendChild(scrim);
+  log("interview_open",{revision_question_shown:usedRevisions});
+  $("intFinish").addEventListener("click",()=>{
+    const value=id=>$(id)?.value.trim()||"";
+    const answers={most_helpful:value("intHelpful"),most_confusing:value("intFrustrating"),
+      could_get_explanation:value("intNeeded"),suggested_change:value("intChange"),
+      revision_helped:usedRevisions?value("intRevision"):null};
+    S.interview=answers;
+    log("interview_submit",{answered:Object.values(answers).filter(Boolean).length,revision_question_shown:usedRevisions});
+    scrim.remove(); finish();
+  });
+}
+const SHEET_URL="PASTE_YOUR_NEW_APPS_SCRIPT_WEB_APP_EXEC_URL_HERE";
 const PRACTICE=new URLSearchParams(location.search).get("practice")==="1";  // add ?practice=1 to test without saving
 const DONE_KEY="datadash_done_v1", SEND_KEY="datadash_unsent_v1";
 function store(k,v){ try{ if(v===null) localStorage.removeItem(k); else localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
 function recall(k){ try{ return JSON.parse(localStorage.getItem(k)||"null"); }catch(e){ return null; } }
 async function callSheet(body){
+  if(!/^https:\/\/script\.google\.com\/macros\/s\/[^/]+\/exec$/.test(SHEET_URL)) throw new Error("Configure the new Google Apps Script deployment URL before collecting data");
   const r=await fetch(SHEET_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(body),redirect:"follow"});
   const j=await r.json(); if(!j.ok) throw new Error(j.error||"not saved"); return j;
 }
@@ -871,7 +992,16 @@ function buildRows(){ return S.results.map((r,i)=>{ const steps=Object.values(r.
   return {participant_id:S.pid, condition:S.cond, task_order:S.order.join("-"), task_position:i+1, task:r.task, task_name:TASKS[r.task].name,
     correct:r.correct?1:0, steps_correct:steps.filter(Boolean).length, steps_total:steps.length, time_seconds:+(r.duration_ms/1000).toFixed(1),
     help_requests:r.help_requests, revision_requests:r.revision_requests, followups:r.followups,
-    confidence:r.confidence, uncertainty:r.uncertainty, session_started:S.log[0].t}; }); }
+    confidence:r.confidence, uncertainty:r.uncertainty,
+    explanation_clarity:r.explanation_clarity,perceived_control:r.perceived_control,mental_demand:r.mental_demand,
+    clarity_not_used:r.clarity_not_used?1:0,control_not_used:r.control_not_used?1:0,
+    background_age_range:S.background?.age_range||"",background_dashboard_experience:S.background?.dashboard_experience||"",
+    background_ai_frequency:S.background?.ai_use_frequency||"",background_chart_experience:S.background?.chart_creation_experience||"",
+    background_software_confidence:S.background?.software_learning_confidence??"",
+    session_started:S.log[0].t,
+    ...(i===S.results.length-1?{feedback_most_helpful:S.interview?.most_helpful||"",feedback_most_confusing:S.interview?.most_confusing||"",
+      feedback_could_get_explanation:S.interview?.could_get_explanation||"",feedback_suggested_change:S.interview?.suggested_change||"",
+      feedback_revision_helped:S.interview?.revision_helped||""}:{})}; }); }
 async function sendResults(){
   const job=recall(SEND_KEY); if(!job) return;
   $("btn-retry").classList.add("hidden"); $("endMsg").textContent="Saving your answers…";
@@ -887,7 +1017,7 @@ function finish(){
   log("session_end",{results:S.results});
   $("app").classList.add("hidden"); $("end").classList.remove("hidden");
   if(PRACTICE){ $("endMsg").textContent="Practice run finished. Nothing was saved."; return; }
-  store(SEND_KEY,{action:"finish",pid:S.pid,rows:buildRows(),events:S.log});
+  store(SEND_KEY,{action:"finish",pid:S.pid,rows:buildRows(),events:S.log,background:S.background||{},interview:S.interview||{}});
   sendResults();
 }
 
@@ -896,20 +1026,37 @@ function finish(){
 ------------------------------------------------------------------ */
 $("consent").addEventListener("change",e=>{ $("startSession").disabled=!e.target.checked; });
 function begin(a){
-  S={pid:a.pid, cond:a.cond, order:a.order.split(""), taskIndex:0, results:[], log:[], t0:performance.now()};
-  $("condChip").textContent=S.cond==="revisable"?"Revisable":"One-Directional";
-  $("condChip").classList.toggle("rev",S.cond==="revisable");
+  if(!a || !a.pid || !["revisable","one-directional"].includes(a.cond) || !["AB","BA"].includes(a.order)) throw new Error("Invalid study assignment");
+  S={pid:a.pid, cond:a.cond, order:a.order.split(""), taskIndex:0, trainingComplete:false,
+    results:[], log:[], interview:null, background:pendingBackground, t0:performance.now()};
+  $("condChip").textContent="";
+  $("condChip").classList.add("hidden");
   log("session_start",{order:S.order});
-  $("setup").classList.add("hidden"); $("app").classList.remove("hidden");
-  D=freshDash(); renderDash(); showTaskCard();
+  log("background_submit",{answers:S.background});
+  $("setup").classList.add("hidden"); $("background").classList.add("hidden"); $("app").classList.remove("hidden");
+  D=freshDash(); renderDash(); showOrientation();
 }
-$("startSession").addEventListener("click",async()=>{
-  const b=$("startSession");
-  if(PRACTICE){ begin({pid:"PRACTICE",cond:Math.random()<.5?"revisable":"one-directional",order:Math.random()<.5?"AB":"BA"}); return; }
-  if(recall(DONE_KEY)){ $("setupMsg").textContent="You've already completed this study on this device. Thank you!"; return; }
-  b.disabled=true; b.textContent="Starting…"; $("setupMsg").textContent="";
-  try{ begin(await callSheet({action:"start"})); }
-  catch(e){ $("setupMsg").textContent="The study couldn't start. Check your internet connection and try again."; b.disabled=false; b.textContent="Start study"; }
+let pendingBackground=null;
+$("startSession").addEventListener("click",()=>{
+  if(recall(DONE_KEY) && !PRACTICE){ $("setupMsg").textContent="You've already completed this study on this device. Thank you!"; return; }
+  $("setup").classList.add("hidden"); $("background").classList.remove("hidden");
+  $("bgAge").focus();
+});
+$("backgroundForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const b=$("bgContinue");
+  const v=id=>$(id).value;
+  pendingBackground={age_range:v("bgAge")||"prefer_not",dashboard_experience:v("bgDashboard"),
+    ai_use_frequency:v("bgAI"),chart_creation_experience:v("bgCharts"),
+    software_learning_confidence:v("bgConfidence")==="prefer_not"?null:Number(v("bgConfidence"))};
+  b.disabled=true; b.textContent="Starting…"; $("bgMsg").textContent="";
+  try{
+    if(PRACTICE){
+      const params=new URLSearchParams(location.search);
+      begin({pid:"PRACTICE",cond:params.get("condition")==="one-directional"?"one-directional":"revisable",
+        order:params.get("order")==="BA"?"BA":"AB"});
+    }else begin(await callSheet({action:"start"}));
+  }catch(err){ $("bgMsg").textContent="The study couldn't start. Check your connection and try again.";b.disabled=false;b.textContent="Continue to training"; }
 });
 if(!PRACTICE && recall(SEND_KEY)){ $("setup").classList.add("hidden"); $("end").classList.remove("hidden"); sendResults(); }
 $("btn-filter").addEventListener("click",e=>{ringHit("btn-filter"); openFilter(e.currentTarget);});
@@ -922,11 +1069,19 @@ $("btn-assist").addEventListener("click",()=>{ $("assistant").classList.contains
 $("btn-close-assist").addEventListener("click",closeAssistant);
 $("composer").addEventListener("submit",e=>{e.preventDefault(); const v=$("ask").value.trim(); if(!v) return; $("ask").value=""; handleAsk(v);});
 $("btn-submit").addEventListener("click",submitTask);
+const params=new URLSearchParams(location.search);
+if(PRACTICE || params.get("researcher")==="1") $("logbtn").classList.remove("hidden");
+$("btn-dl-log2").addEventListener("click",async()=>{
+  if(!S.log) return;
+  const payload={participant_id:S.pid,condition:S.cond,task_order:S.order?.join(""),background:S.background,events:S.log,results:S.results,interview:S.interview};
+  const result=await saveFile("datadash_"+String(S.pid).replace(/[^a-z0-9_-]/gi,"_")+"_log.json",JSON.stringify(payload,null,2));
+  toast(result==="saved"?"Log download started":"Could not download log");
+});
 $("logbtn").addEventListener("click",()=>{ const d=$("logdrawer"); d.classList.toggle("hidden"); if(!d.classList.contains("hidden")) renderLog(); });
 document.addEventListener("keydown",e=>{ if(e.key==="Escape") closeLayer(); });
 $("btn-retry").addEventListener("click",sendResults);
 window.addEventListener("resize",()=>{ if(S.log && !$("app").classList.contains("hidden")) renderDash(); closeLayer(); });
-if(window.matchMedia) window.matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change",()=>{ if(S.log) renderDash(); });
+// Fixed light visual theme for all participants; do not vary appearance by OS preference.
 })();
 </script>
 </body>
