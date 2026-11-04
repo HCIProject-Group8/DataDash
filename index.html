@@ -978,7 +978,7 @@ function showInterview(){
     scrim.remove(); finish();
   });
 }
-const SHEET_URL="PASTE_YOUR_NEW_APPS_SCRIPT_WEB_APP_EXEC_URL_HERE";
+const SHEET_URL="https://script.google.com/macros/s/AKfycbyqIeSgv4kcPyx89EzrPDGx_tmTw9duK0tYLy2JaZS9zOdT47yJzPs4l2XH3i3Muc5d4Q/exec";
 const PRACTICE=new URLSearchParams(location.search).get("practice")==="1";  // add ?practice=1 to test without saving
 const DONE_KEY="datadash_done_v1", SEND_KEY="datadash_unsent_v1";
 function store(k,v){ try{ if(v===null) localStorage.removeItem(k); else localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
